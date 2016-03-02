@@ -1,0 +1,16 @@
+Wed Mar 02 18:54:31 GMT 2016 : Apache Derby Network Server - 10.8.3.2 - (1557835) started and ready to accept connections on port 1527
+----------------------------------------------------------------
+Wed Mar 02 18:54:41 GMT 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.8.3.2 - (1557835): instance a816c00e-0153-38ae-67c1-0000162a0ede 
+on database directory C:\Users\Mateusz\OneDrive\IS2209-05 project\Project1-3\Project1-3\taxiDB  with class loader sun.misc.Launcher$AppClassLoader@15d56d5 
+Loaded from file:/E:/Program%20Files/Java/jdk1.7.0_79/db/lib/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.7.0_79-b15
+user.dir=E:\Program Files\Java\jdk1.7.0_79\db
+os.name=Windows 8.1
+os.arch=x86
+os.version=6.3
+derby.system.home=C:\Users\Mateusz\OneDrive\IS2209-05 project\Project1-3\Project1-3
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Wed Mar 02 19:53:40 GMT 2016: Shutting down Derby engine
