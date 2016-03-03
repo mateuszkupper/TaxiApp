@@ -356,8 +356,28 @@ public class IOdb {
             
             return ID;
         } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Error getting a driver: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error getting ID: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
             return 0;
         }     
     }   
+
+    void changeOrderStatus(int iorderID, String istatus) {
+        try {
+            java.sql.Statement stmt = this.loginToDB();
+            String updateQuery = "UPDATE NAME.Orders SET Status='" + istatus + "' WHERE OrderID=" + iorderID + "";            
+            stmt.executeUpdate(updateQuery);
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog(null, "Error saving a trip: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);  
+        }
+    }
+
+    void confirmAtDesignatedStand(int driverID) {
+        try {
+            java.sql.Statement stmt = this.loginToDB();
+            String updateQuery = "UPDATE NAME.Drivers SET Location='Parnell Place' WHERE DriverID=" + driverID + "";            
+            stmt.executeUpdate(updateQuery);
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog(null, "Error updating location: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);  
+        }        
+    }
 }

@@ -100,21 +100,36 @@ public class Driver extends User {
  
     //handleNotification(message "ALTERED, CANCELLED, etc.", response - from a messagebox)
     //deals with notifications according to their type/message    
-    public void handleNotification(String notificationMessage, String popupResponse) {
-        switch (notificationMessage) {
-            case "a": /* in case of yes/no popups*/
-                popupResponse = "AVAILABLE";
-                /*database table - driver*/
+    public void handleNotification(String inotificationMessage, int imessageBoxResponse, int inotificationID, int iorderID) {
+        switch (inotificationMessage) {
+            case "TRIP_REQUEST":
+                if(imessageBoxResponse==JOptionPane.YES_OPTION) {
+                   this.acceptOrder(iorderID);
+                } else {
+                   this.rejectOrder(iorderID);
+                }             
                 break;
-            case "b":
-                /*database table - customer*/
+            case "CANCELLED":
+                
                 break;
-            case "c":
-                /*database table - dispatcher*/
         }
     }
     
-   public void cancelOrder(int orderID) {
-       database.rescheduleOrder(orderID);
-   }   
+   public void cancelOrder(int iorderID) {
+       database.rescheduleOrder(iorderID);
+   }
+
+    public void confirmCompletedTrip(int iorderID) {
+        database.changeOrderStatus(iorderID, "COMPLETED");
+    }
+    
+    public void confirmAtDesignatedStand() {
+        database.confirmAtDesignatedStand(this.driverID);
+    }
+    
+    public void confirmArrivalAtPickUpPoint(int iorderID) {
+        int customerID = database.findOrderCustomerDriverID(iorderID, "CUSTOMER");
+        IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "AT_PICK_UP_POINT");
+        database.changeOrderStatus(iorderID, "PICK_UP_POINT");
+    }
 }
