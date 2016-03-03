@@ -10,6 +10,8 @@
  */
 package application;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 public class Driver extends User {
@@ -89,13 +91,19 @@ public class Driver extends User {
     public void acceptOrder(int iorderID) {
         database.updateOrderStatus("IN_PROGRESS", iorderID);
         int customerID = database.findOrderCustomerDriverID(iorderID, "CUSTOMER");
-        IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "TRIP_REQUEST");
+        IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "TRIP_ACCEPTED");
     }
     
     //void rejectOrder(orderID)
     //reschadules an order and finds a new driver  
     public void rejectOrder(int iorderID) {
-        database.rescheduleOrder(iorderID);
+        try {
+            database.rescheduleOrder(iorderID, this.driverID);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error rescheduling the order! No available drivers!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            int customerID = database.findOrderCustomerDriverID(iorderID, "CUSTOMER");
+            IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "NO_DRIVERS");            
+        }
     }
  
     //handleNotification(message "ALTERED, CANCELLED, etc.", response - from a messagebox)
@@ -105,8 +113,10 @@ public class Driver extends User {
             case "TRIP_REQUEST":
                 if(imessageBoxResponse==JOptionPane.YES_OPTION) {
                    this.acceptOrder(iorderID);
+                   database.deleteNotification(inotificationID);
                 } else {
                    this.rejectOrder(iorderID);
+                   database.deleteNotification(inotificationID);
                 }             
                 break;
             case "CANCELLED":
@@ -116,7 +126,13 @@ public class Driver extends User {
     }
     
    public void cancelOrder(int iorderID) {
-       database.rescheduleOrder(iorderID);
+        try {
+            database.rescheduleOrder(iorderID, this.driverID);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error rescheduling the order! No available drivers!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            int customerID = database.findOrderCustomerDriverID(iorderID, "CUSTOMER");
+            IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "NO_DRIVERS");
+        }
    }
 
     public void confirmCompletedTrip(int iorderID) {

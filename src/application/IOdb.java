@@ -179,7 +179,7 @@ public class IOdb {
         try {        
             java.sql.Statement stmt = this.loginToDB();
                         
-            String updateQuery = "UPDATE NAME.Orders SET Status='" + istatus + "' WHERE UserName='" + istatus + "'";            
+            String updateQuery = "UPDATE NAME.Orders SET Status='" + istatus + "' WHERE OrderID=" + iorderID + "";            
             
             stmt.executeUpdate(updateQuery);
             con.close();             
@@ -191,7 +191,7 @@ public class IOdb {
     //void rescheduleOrder(orderID)
     //reschedules an order after a driver rejects a trip
     //finds new driver to accept an order
-    public void rescheduleOrder(int iorderID) {
+    public void rescheduleOrder(int iorderID, int ioldDriverID) throws Exception {
         try {
             java.sql.Statement stmt = this.loginToDB();
             ResultSet dbResults;
@@ -204,18 +204,22 @@ public class IOdb {
                 pickUpPoint = dbResults.getString("PickUpPointLocation");
             }           
             
-            int driverID = this.findClosestDriver(pickUpPoint);            
+            int driverID = this.findClosestDriver(pickUpPoint, ioldDriverID);            
+            if(driverID==0) {
+                throw new Exception();
+            }
+            
             
             String updateQuery = "UPDATE NAME.Orders SET DriverID=" + driverID + " WHERE OrderID=" + iorderID + "";            
             stmt.executeUpdate(updateQuery);
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            throw new Exception();
         }            
     }
     
     //String findDriver(location)
     //finds the nearest driver and returns its username 
-    public int findClosestDriver(String ipickUpPoint) /**scheduling orders*/ {
+    public int findClosestDriver(String ipickUpPoint, int oldDriverID) throws Exception /**scheduling orders*/ {
         try {
             java.sql.Statement stmt = this.loginToDB();
             ResultSet dbResults;
@@ -238,21 +242,29 @@ public class IOdb {
                 IOmaps maps = new IOmaps();
                 distance[i] = maps.calculateDistance(dbDriversResults.getString("Location"), ipickUpPoint);
                 if(i>0){
-                    if(distance[i]<distance[i-1]) {
+                    if(distance[i]<distance[i-1] && dbDriversResults.getInt("DriverID")!=oldDriverID) {
+                        shortestDistance = distance[i];                           
+                        newDriverID = dbDriversResults.getInt("DriverID");                       
+                    }
+                } else {
+                    if(dbDriversResults.getInt("DriverID")!=oldDriverID) {
                         shortestDistance = distance[i];
                         newDriverID = dbDriversResults.getInt("DriverID");
                     }
-                } else {
-                   shortestDistance = distance[i];
-                   newDriverID = dbDriversResults.getInt("DriverID");
                 }
                 i++;
             }         
-
-            con.close();
-            return newDriverID;
+            
+            if(newDriverID==0) {
+                con.close();
+                throw new Exception();                
+            } else {
+                con.close();
+                return newDriverID;                
+            }
+            
         } catch(Exception e) {
-            return 0;
+            throw new Exception();
         }
     }
     
@@ -263,10 +275,10 @@ public class IOdb {
             
             switch (iuserType) {
                 case "DRIVER":
-                    fetchQuery = "SELECT DriverID FROM NAME.Notifications WHERE OrderID=" + iorderID + "";
+                    fetchQuery = "SELECT DriverID FROM NAME.Orders WHERE OrderID=" + iorderID + "";
                     break;
                 case "CUSTOMER":
-                    fetchQuery = "SELECT CustomerID FROM NAME.Notifications WHERE OrderID=" + iorderID + "";
+                    fetchQuery = "SELECT CustomerID FROM NAME.Orders WHERE OrderID=" + iorderID + "";
                     break;
             }
 
@@ -296,7 +308,7 @@ public class IOdb {
         try {        
             java.sql.Statement stmt = this.loginToDB();
                         
-            String updateQuery = "UPDATE NAME.Orders SET Status='CANCELLED' WHERE OrderID='" + iorderID + "'";            
+            String updateQuery = "UPDATE NAME.Orders SET Status='CANCELLED' WHERE OrderID=" + iorderID + "";            
             
             stmt.executeUpdate(updateQuery);
             con.close();             
@@ -333,10 +345,10 @@ public class IOdb {
             String fetchQuery = "";
             switch (iuserType) {
                 case "DRIVER":
-                    fetchQuery = "SELECT DriverID FROM NAME.Drivers WHERE UserName=" + iuserName + "";
+                    fetchQuery = "SELECT DriverID FROM NAME.Drivers WHERE UserName='" + iuserName + "'";
                     break;
                 case "CUSTOMER":
-                    fetchQuery = "SELECT CustomerID FROM NAME.Customers WHERE UserName=" + iuserName + "";
+                    fetchQuery = "SELECT CustomerID FROM NAME.Customers WHERE UserName='" + iuserName + "'";
                     break;
             }
             

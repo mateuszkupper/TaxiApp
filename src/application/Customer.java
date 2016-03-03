@@ -59,13 +59,18 @@ public class Customer extends User {
     public void orderTaxi(String ipickUpPoint, String idestination) {
         if(ipickUpPoint==null) {
             ipickUpPoint = this.location;
-        }
-        
+        }        
         Order trip = new Order();
         double distance = geolocation.calculateDistance(idestination, ipickUpPoint);
-        int driverID = database.findClosestDriver(ipickUpPoint);
-        int orderID = trip.recordOrder(ipickUpPoint, idestination, distance, driverID, this.customerID, "PENDING");
-        IOnotifications notification = new IOnotifications(orderID, driverID, this.customerID, "TRIP_REQUEST");
+        int driverID;
+        try {
+            driverID = database.findClosestDriver(ipickUpPoint, 0);
+            int orderID = trip.recordOrder(ipickUpPoint, idestination, distance, driverID, this.customerID, "PENDING");
+            IOnotifications notification = new IOnotifications(orderID, driverID, this.customerID, "TRIP_REQUEST");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Driver was not found!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+        }
+
     }
     
     //void logIn()

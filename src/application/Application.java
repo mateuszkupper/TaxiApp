@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -32,11 +33,11 @@ public class Application {
 			ex.printStackTrace();
 		}*/
                 
-                Customer c = new Customer("ad", "a", "a");
-                c.orderTaxi("s", "s");
-                c.cancelTaxi(116);
-                
-                        
+                Driver driver = new Driver("driver", "pass");
+                Customer cust = new Customer("customer", "pass");
+                cust.orderTaxi(null, "Place");
+                driver.handleNotification("TRIP_REQUEST", JOptionPane.YES_OPTION, 86, 170);
+                cust.cancelTaxi(170);
 
                 
     }    

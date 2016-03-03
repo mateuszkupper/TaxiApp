@@ -27,9 +27,9 @@ public class Dispatcher extends User {
         }
     }
     
-    public final void signUpUser(String iuserName, String ipassword, String iname) {
+    public final void signUpUser(String iuserName, String ipassword, String iname, String iuserType) {
         try {
-            database.signUp("CUSTOMER", iuserName, ipassword, iname);
+            database.signUp(iuserType, iuserName, ipassword, iname);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error connecting to database!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -45,8 +45,12 @@ public class Dispatcher extends User {
     public void orderTaxi(String ipickUpPoint, String idestination) { 
         Order trip = new Order();
         double distance = geolocation.calculateDistance(idestination, ipickUpPoint);
-        int driverID = database.findClosestDriver(ipickUpPoint);
-        int orderID = trip.recordOrder(ipickUpPoint, idestination, distance, driverID, 0, "PENDING");
-        IOnotifications notification = new IOnotifications(orderID, driverID, 0, "TRIP_REQUEST");
+        try {
+            int driverID = database.findClosestDriver(ipickUpPoint, 0);
+            int orderID = trip.recordOrder(ipickUpPoint, idestination, distance, driverID, 0, "PENDING");
+            IOnotifications notification = new IOnotifications(orderID, driverID, 0, "TRIP_REQUEST");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Driver was not found!" + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+        }
     }   
 }
