@@ -51,14 +51,13 @@ public class Driver extends User {
     //logs out the user    
     public void logOut() throws Throwable {
         database.logOut(this.userName, "DRIVER");
+        //reschedule orders
+            //get all order's of a driver
+                //cancel them
+                //create notifications
+            //
+        //
         this.finalize();
-    }
-    
-    //void changeStatus(status - either "AVAILABLE" or "UNAVAILABLE")
-    //changes driver's status
-    public void changeStatus(String idriverStatus) {
-        this.setDriverStatus(idriverStatus);
-        database.changeDriverStatus(this.driverStatus, this.userName);
     }
     
     //void recordTripDetails(trip destination)
@@ -90,7 +89,7 @@ public class Driver extends User {
     //updates driver's and order status 
     public void acceptOrder(int iorderID) {
         database.updateOrderStatus("IN_PROGRESS", iorderID);
-        int customerID = database.findOrderCustomerDriverID(iorderID, "CUSTOMER");
+        int customerID = database.findOrderCustomerID(iorderID);
         IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "TRIP_ACCEPTED");
     }
     
@@ -101,7 +100,7 @@ public class Driver extends User {
             database.rescheduleOrder(iorderID, this.driverID);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error rescheduling the order! No available drivers!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
-            int customerID = database.findOrderCustomerDriverID(iorderID, "CUSTOMER");
+            int customerID = database.findOrderCustomerID(iorderID);
             IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "NO_DRIVERS");            
         }
     }
@@ -130,7 +129,7 @@ public class Driver extends User {
             database.rescheduleOrder(iorderID, this.driverID);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error rescheduling the order! No available drivers!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
-            int customerID = database.findOrderCustomerDriverID(iorderID, "CUSTOMER");
+            int customerID = database.findOrderCustomerID(iorderID);
             IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "NO_DRIVERS");
         }
    }
@@ -144,7 +143,7 @@ public class Driver extends User {
     }
     
     public void confirmArrivalAtPickUpPoint(int iorderID) {
-        int customerID = database.findOrderCustomerDriverID(iorderID, "CUSTOMER");
+        int customerID = database.findOrderCustomerID(iorderID);
         IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "AT_PICK_UP_POINT");
         database.changeOrderStatus(iorderID, "PICK_UP_POINT");
     }

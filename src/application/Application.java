@@ -33,11 +33,7 @@ public class Application {
 			ex.printStackTrace();
 		}*/
                 
-                Driver driver = new Driver("driver", "pass");
                 Customer cust = new Customer("customer", "pass");
-                cust.orderTaxi(null, "Place");
-                driver.handleNotification("TRIP_REQUEST", JOptionPane.YES_OPTION, 86, 170);
-                cust.cancelTaxi(170);
 
                 
     }    

@@ -36,8 +36,8 @@ public class Dispatcher extends User {
     }
             
     public void cancelTaxi(int iorderID) {
-        database.cancelOrder(iorderID);
-        int driverID = database.findOrderCustomerDriverID(iorderID, "DRIVER");
+        database.updateOrderStatus("CANCELLED", iorderID);
+        int driverID = database.findOrderDriverID(iorderID);
         IOnotifications notification = new IOnotifications(iorderID, driverID, 0, "CANCELLED");
     }
 

@@ -31,18 +31,15 @@ public class Order {
     //Gets current time
     //Sets and saves order details
     public int recordOrder(String ipickupPointLocation, String idestination, double idistance, int idriverID, int icustomerID, String istatus) {
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
             int orderID;
             
-            setTime(sdf.format(cal.getTime()));
             setPickupPointLocation(ipickupPointLocation);
             setDestination(idestination);
             setDistance(idistance);
             setStatus(istatus);
             setDriverID(idriverID);
             setCustomerID(icustomerID);
-            orderID = database.recordTripDetails(this.destination, this.pickupPointLocation, this.distance, this.driverID, this.customerID, istatus);
+            orderID = database.recordTripDetails(this);
             return orderID;
     }
     

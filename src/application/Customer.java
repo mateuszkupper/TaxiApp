@@ -106,8 +106,8 @@ public class Customer extends User {
     //cancels an order
     //creates a notification for a driver
     public void cancelTaxi(int iorderID) {
-        database.cancelOrder(iorderID);
-        int driverID = database.findOrderCustomerDriverID(iorderID, "DRIVER");
+        database.updateOrderStatus("CANCELLED", iorderID);
+        int driverID = database.findOrderDriverID(iorderID);
         IOnotifications notification = new IOnotifications(iorderID, driverID, this.customerID, "CANCELLED");
     }
     
