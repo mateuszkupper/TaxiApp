@@ -74,7 +74,6 @@ public class IOdb {
                     this.executeUpdateQuery(updateQuery);
                 JOptionPane.showMessageDialog(null, "Login successful!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(null, "Password and username do not match!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
                 throw new Exception();
             }
         }

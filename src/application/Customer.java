@@ -62,7 +62,7 @@ public class Customer extends User {
     //to either accept or reject an order
     public void orderTaxi(String ipickUpPoint, String idestination) {
         idestination += ",Cork,Ireland";
-        if(ipickUpPoint==null) {
+        if("Here".equals(ipickUpPoint)) {
             ipickUpPoint = this.getLocation();
         } else {
             ipickUpPoint += ",Cork,Ireland";

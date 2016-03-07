@@ -95,7 +95,7 @@ public class IOmap {
                             +  String.valueOf(obj.getDouble("longitude"));
                     break;
                 } catch(Exception e) {
-                    //throw new Exception();
+                    location="UCC,Cork,Ireland";
                 }
         }
         return location;

@@ -24,7 +24,7 @@ public class User {
             database.logIn(iuserType, this.userName, this.password, ilocation);
             this.setID(database.getID(this.userName, iuserType));
         } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Login and password do not match!" + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Login and password do not match!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
             throw new Exception();
         }
     }
