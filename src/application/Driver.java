@@ -10,6 +10,7 @@
  */
 package application;
 
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -17,134 +18,158 @@ import javax.swing.JOptionPane;
 public class Driver extends User {
     
     //CLASS VARIABLES
-    private final String location;
+    private String location;
     private String driverStatus;
-    private int driverID;
-    private IOmaps geolocation; 
-    private IOdb database;
+    private IOmap geolocation; 
     
     //CONSTRUCTOR
     //Parameters: user name, password
     //gets the location, if it is a signup event it will create a new account
     //logs the user in
-    public Driver(String iuserName, String ipassword) {
+    public Driver(String iuserName, String ipassword) throws Exception {
         super(iuserName, ipassword);
         this.database = new IOdb();
-        this.geolocation = new IOmaps();
+        this.geolocation = new IOmap();
         this.location = geolocation.getLocation("DRIVER");
         this.driverStatus = "AVAILABLE";
-        this.logIn();
-    }
-    
-    //void logIn()
-    //logs in the driver   
-    public final void logIn() {
-        try {
-            database.logIn("DRIVER", this.userName, this.password, this.location);
-            this.driverID = database.getID(this.userName, "DRIVER");
+        try {    
+            this.logIn("DRIVER", this.location);
         } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Error connecting to database!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            throw new Exception();
         }
     }
 
     //void logOut()
     //logs out the user    
     public void logOut() throws Throwable {
-        database.logOut(this.userName, "DRIVER");
-        //reschedule orders
-            //get all order's of a driver
-                //cancel them
-                //create notifications
-            //
-        //
+        database.executeUpdateQuery("UPDATE NAME.Drivers SET Status='LOGGED_OUT' WHERE UserName='" + this.userName + "'");
+        Order orderObj = new Order();
+        int[] orders = orderObj.getOrders(this.getID());
+        for (int order : orders) {
+            this.cancelOrder(order);
+        }
         this.finalize();
     }
     
     //void recordTripDetails(trip destination)
     //records trip requested at designated stands
     public void recordTripDetails(String idestination) {
-        double distance = geolocation.calculateDistance(idestination, this.location);
+        double distance = geolocation.calculateDistance(idestination, this.getLocation());
         Order trip = new Order();
-        int a = trip.recordOrder(this.location, idestination, distance, this.driverID, 0, "IN_PROGRESS");
+        trip.recordOrder(this.getLocation(), idestination, distance, this.getID(), 0, "IN_PROGRESS", 0);
     }
-    
-    /*
-    * Getters & Setters
-    */    
-    public String getlocation() {
-        return this.location;
-    }
-    
-    public String getDriverStatus() {
-        return this.driverStatus;
-    }
-    
-    public void setDriverStatus(String idriverStatus) {
-        this.driverStatus = idriverStatus;
-    }
-    
-    /**********non-essential methods***********/
-    
+
     //void acceptOrder(orderID)
     //updates driver's and order status 
     public void acceptOrder(int iorderID) {
-        database.updateOrderStatus("IN_PROGRESS", iorderID);
+        try {
+            database.executeUpdateQuery("UPDATE NAME.Orders SET Status='IN_PROGRESS' WHERE OrderID=" + iorderID + "");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Database error!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+        }
         int customerID = database.findOrderCustomerID(iorderID);
-        IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "TRIP_ACCEPTED");
+        Notification notification = new Notification(iorderID, this.getID(), customerID, "TRIP_ACCEPTED");
     }
     
     //void rejectOrder(orderID)
     //reschadules an order and finds a new driver  
     public void rejectOrder(int iorderID) {
         try {
-            database.rescheduleOrder(iorderID, this.driverID);
+            Order order = new Order();
+            order.rescheduleOrder(iorderID, this.getID());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error rescheduling the order! No available drivers!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
             int customerID = database.findOrderCustomerID(iorderID);
-            IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "NO_DRIVERS");            
+            Notification notification = new Notification(iorderID, this.getID(), customerID, "NO_DRIVERS");            
         }
     }
  
     //handleNotification(message "ALTERED, CANCELLED, etc.", response - from a messagebox)
     //deals with notifications according to their type/message    
-    public void handleNotification(String inotificationMessage, int imessageBoxResponse, int inotificationID, int iorderID) {
-        switch (inotificationMessage) {
+    public void handleNotification(Notification notification, int imessageBoxResponse) {
+        switch (notification.getMessage()) {
             case "TRIP_REQUEST":
                 if(imessageBoxResponse==JOptionPane.YES_OPTION) {
-                   this.acceptOrder(iorderID);
-                   database.deleteNotification(inotificationID);
+                   this.acceptOrder(notification.getOrderID());
+                   Notification newNotification = new Notification();
+                   notification.deleteNotification(notification.getNotificationID());
                 } else {
-                   this.rejectOrder(iorderID);
-                   database.deleteNotification(inotificationID);
+                   this.rejectOrder(notification.getOrderID());
+                   Notification newNotification = new Notification();
+                   notification.deleteNotification(notification.getNotificationID());
                 }             
                 break;
-            case "CANCELLED":
-                
+            case "CANCELLED":               
                 break;
         }
     }
     
    public void cancelOrder(int iorderID) {
         try {
-            database.rescheduleOrder(iorderID, this.driverID);
+            Order order = new Order();
+            order.rescheduleOrder(iorderID, this.getID());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error rescheduling the order! No available drivers!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
             int customerID = database.findOrderCustomerID(iorderID);
-            IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "NO_DRIVERS");
+            Notification notification = new Notification(iorderID, this.getID(), customerID, "NO_DRIVERS");
         }
    }
 
     public void confirmCompletedTrip(int iorderID) {
-        database.changeOrderStatus(iorderID, "COMPLETED");
+        try {
+            database.executeUpdateQuery("UPDATE NAME.Orders SET Status='COMPLETED' WHERE OrderID=" + iorderID + "");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Database error!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
     
     public void confirmAtDesignatedStand() {
-        database.confirmAtDesignatedStand(this.driverID);
+        try {
+            database.executeUpdateQuery("UPDATE NAME.Drivers SET Location='Parnell Place' WHERE DriverID=" + this.getID() + "");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Database error!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+        } 
     }
     
     public void confirmArrivalAtPickUpPoint(int iorderID) {
         int customerID = database.findOrderCustomerID(iorderID);
-        IOnotifications notification = new IOnotifications(iorderID, this.driverID, customerID, "AT_PICK_UP_POINT");
-        database.changeOrderStatus(iorderID, "PICK_UP_POINT");
+        Notification notification = new Notification(iorderID, this.getID(), customerID, "AT_PICK_UP_POINT");
+        try {
+            database.executeUpdateQuery("UPDATE NAME.Orders SET Status='PICK_UP_POINT' WHERE OrderID=" + iorderID + "");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Database error!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+        } 
+    }
+    
+    /*
+    * Getters & Setters
+    */    
+
+    /**
+     * @return the location
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * @param location the location to set
+     */
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    /**
+     * @return the driverStatus
+     */
+    public String getDriverStatus() {
+        return driverStatus;
+    }
+
+    /**
+     * @param driverStatus the driverStatus to set
+     */
+    public void setDriverStatus(String driverStatus) {
+        this.driverStatus = driverStatus;
     }
 }

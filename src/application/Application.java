@@ -33,8 +33,18 @@ public class Application {
 			ex.printStackTrace();
 		}*/
                 
-                Customer cust = new Customer("customer", "pass");
-
+                //Driver d = new Driver("drisfaver", "pascs");
+                Dispatcher c = new Dispatcher("dispatcher", "pass");
+                try {
+                    //d.logOut();
+                } catch(Exception e) {
+                    
+                } catch (Throwable ex) {
+            Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                
+                
+                
                 
     }    
 }

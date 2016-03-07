@@ -32,7 +32,7 @@ public class IOdb {
         return stmt;
     }
     
-    private void executeUpdateQuery(String iquery) throws SQLException, ClassNotFoundException {
+    public void executeUpdateQuery(String iquery) throws SQLException, ClassNotFoundException {
         java.sql.Statement stmt = this.loginToDB();
         stmt.executeUpdate(iquery);
         con.close();     
@@ -75,6 +75,7 @@ public class IOdb {
                 JOptionPane.showMessageDialog(null, "Login successful!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(null, "Password and username do not match!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+                throw new Exception();
             }
         }
         con.close();
@@ -82,7 +83,7 @@ public class IOdb {
     
     //void signUp(user type, user name, password)
     //signs up a user depending on a user type
-    public boolean signUp(String iuserType, String iuserName, String ipassword, String iname) throws Exception {
+    public void signUp(String iuserType, String iuserName, String ipassword, String iname) throws Exception {
         java.sql.Statement stmt = this.loginToDB();
         ResultSet dbResults;
         String fetchQuery = "";
@@ -106,39 +107,14 @@ public class IOdb {
             dbResults = stmt.executeQuery(fetchQuery);
             if (dbResults.next()) {
                 JOptionPane.showMessageDialog(null, "Username already exists! Choose different username!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
-                return false;
+                throw new Exception();
             } else {
                 this.executeUpdateQuery(updateQuery);
                 JOptionPane.showMessageDialog(null, "Sign up successful!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
-                return true;
             }
         }
         con.close();
-        return false;
     }         
-
-   
-    //void logOut(user name, user type)
-    //logs out a user
-    public void logOut(String iuserName, String iuserType) {
-        try {
-            String driverStatus = "LOGGED_OUT";
-            String updateQuery = "";
-            
-            switch (iuserType) {
-                case "DRIVER":
-                    updateQuery = "UPDATE NAME.Drivers SET Status='" + "LOGGED_OUT" + "' WHERE UserName='" + iuserName + "'";
-                    break;
-                case "CUSTOMER":
-                    updateQuery = "UPDATE NAME.Customers SET Status='" + "LOGGED_OUT" + "' WHERE UserName='" + iuserName + "'";
-                    break;
-            }              
-            
-            this.executeUpdateQuery(updateQuery);;
-        } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Error logging out! " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }   
     
     //int recordTripDetails(trip details)
     //records a trip and retrieves its ID given by a database (autonumber)
@@ -147,8 +123,8 @@ public class IOdb {
             java.sql.Statement stmt = this.loginToDB();       
             int orderID = 0;
             
-            String updateQuery = "INSERT INTO NAME.Orders(Destination, PickUpPointLocation, Status, CustomerID, DriverID, Distance) VALUES ('" + iorder.getDestination() + "', '" + 
-            iorder.getPickupPointLocation() + "', '" + iorder.getStatus() + "', " + String.valueOf(iorder.getCustomerID()) + ", " + String.valueOf(iorder.getDriverID()) + ", " + String.valueOf(iorder.getDistance()) + ")";
+            String updateQuery = "INSERT INTO NAME.Orders(Destination, PickUpPointLocation, Status, CustomerID, DriverID, Distance, TravelTime) VALUES ('" + iorder.getDestination() + "', '" + 
+            iorder.getPickupPointLocation() + "', '" + iorder.getStatus() + "', " + String.valueOf(iorder.getCustomerID()) + ", " + String.valueOf(iorder.getDriverID()) + ", " + String.valueOf(iorder.getDistance())+ ", " + iorder.getTravelTime() + ")";
             
             this.executeUpdateQuery(updateQuery);
             
@@ -164,17 +140,6 @@ public class IOdb {
         } catch(Exception e) {
             JOptionPane.showMessageDialog(null, "Error recording a trip: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
             return 0;
-        }       
-    }
-
-    //void updateOrderStatus(status, orderID)
-    //updates order status eg. PENDING, ACCEPTED, IN_PROGRESS
-    public void updateOrderStatus(String istatus, int iorderID) {
-        try {               
-            String updateQuery = "UPDATE NAME.Orders SET Status='" + istatus + "' WHERE OrderID=" + iorderID + "";                        
-            this.executeUpdateQuery(updateQuery);            
-        } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Error changing trip status: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);            
         }       
     }
     
@@ -202,7 +167,7 @@ public class IOdb {
             
             String updateQuery = "UPDATE NAME.Orders SET DriverID=" + driverID + " WHERE OrderID=" + iorderID + "";
             int customerID = this.findOrderCustomerID(iorderID);
-            IOnotifications notification = new IOnotifications(iorderID, driverID, customerID, "TRIP_REQUEST");
+            Notification notification = new Notification(iorderID, driverID, customerID, "TRIP_REQUEST");
             this.executeUpdateQuery(updateQuery);
         } catch(Exception e) {
             throw new Exception();
@@ -231,7 +196,7 @@ public class IOdb {
             double[] distance = new double[total];
             double shortestDistance = 0;
             while (dbDriversResults.next()) {
-                IOmaps maps = new IOmaps();
+                IOmap maps = new IOmap();
                 distance[i] = maps.calculateDistance(dbDriversResults.getString("Location"), ipickUpPoint);
                 if(i>0){
                     if(distance[i]<distance[i-1] && dbDriversResults.getInt("DriverID")!=oldDriverID) {
@@ -260,7 +225,7 @@ public class IOdb {
         }
     }
     
-    int findOrderDriverID(int iorderID) {
+    public int findOrderDriverID(int iorderID) {
         try {           
             java.sql.Statement stmt = this.loginToDB();                                           
             String fetchQuery = "SELECT DriverID FROM NAME.Orders WHERE OrderID=" + iorderID + "";
@@ -280,7 +245,7 @@ public class IOdb {
         }      
     }
 
-    int findOrderCustomerID(int iorderID) {
+    public int findOrderCustomerID(int iorderID) {
         try {           
             java.sql.Statement stmt = this.loginToDB();                                           
             String fetchQuery = "SELECT CustomerID FROM NAME.Orders WHERE OrderID=" + iorderID + "";
@@ -298,27 +263,9 @@ public class IOdb {
             JOptionPane.showMessageDialog(null, "Error getting a customerID: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
             return 0;
         }  
-    }
-    
-    void createNewNotification(int iorderID, int idriverID, int icustomerID, String imessage) {
-        try {                       
-            String updateQuery = "INSERT INTO NAME.Notifications(CustomerID, DriverID, OrderID, Message) VALUES (" + icustomerID + ", " + idriverID + ", " + iorderID + ", '" + imessage + "')";
-            this.executeUpdateQuery(updateQuery);
-        } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Error creating a notification: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);            
-        }        
-    }
-
-    void deleteNotification(int inotificationID) {
-        try {                 
-            String updateQuery = "DELETE FROM Notifications WHERE NotificationID=" + inotificationID;
-            this.executeUpdateQuery(updateQuery);
-        } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Error deleting a notification: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);            
-        }              
     }  
 
-    int getID(String iuserName, String iuserType) {
+    public int getID(String iuserName, String iuserType) {
         try {           
             java.sql.Statement stmt = this.loginToDB();                                           
             String fetchQuery = "";
@@ -328,6 +275,9 @@ public class IOdb {
                     break;
                 case "CUSTOMER":
                     fetchQuery = "SELECT CustomerID FROM NAME.Customers WHERE UserName='" + iuserName + "'";
+                    break;
+                case "DISPATCHER":
+                    fetchQuery = "SELECT DispatcherID FROM NAME.Dispatchers WHERE UserName='" + iuserName + "'";
                     break;
             }
             
@@ -351,22 +301,61 @@ public class IOdb {
             return 0;
         }     
     }   
-
-    void changeOrderStatus(int iorderID, String istatus) {
-        try {
-            String updateQuery = "UPDATE NAME.Orders SET Status='" + istatus + "' WHERE OrderID=" + iorderID + "";            
-            this.executeUpdateQuery(updateQuery);
+    
+    public int[] getOrders(int idriverID) throws Exception {
+        try {        
+            java.sql.Statement stmt = this.loginToDB();
+            
+            String numOfRowsQuery = "SELECT COUNT(*) FROM NAME.Drivers WHERE DriverID=" + idriverID + "";
+            ResultSet dbNumOfRowsResult = stmt.executeQuery(numOfRowsQuery);
+            int numberOfRows = 0;
+            if(dbNumOfRowsResult.next()) {
+                numberOfRows = dbNumOfRowsResult.getInt(1);
+            }
+            
+            String fetchQuery = "SELECT OrderID FROM Orders WHERE DriverID=" + idriverID + "";
+            ResultSet dbResults = stmt.executeQuery(fetchQuery); 
+            
+            int[] orders = new int[numberOfRows];
+            int i=0;
+            while (dbResults.next()) {
+                orders[i] = dbResults.getInt("OrderID");
+                i++;
+            }
+            return orders;
         } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Error saving a trip: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);  
-        }
+            throw new Exception();
+        }          
     }
-
-    void confirmAtDesignatedStand(int driverID) {
+    
+    public Notification checkForNotification(String iuserType, int iuserID) throws Exception {
         try {
-            String updateQuery = "UPDATE NAME.Drivers SET Location='Parnell Place' WHERE DriverID=" + driverID + "";            
-            this.executeUpdateQuery(updateQuery);
+            java.sql.Statement stmt = this.loginToDB();
+            String fetchQuery = "";
+            switch (iuserType) {
+                case "DRIVER":
+                    fetchQuery = "SELECT NotificationID, CustomerID"
+                            + ", DriverID, OrderID, Message FROM Notifications WHERE DriverID=" + iuserID + "";
+                    break;
+                case "CUSTOMER":
+                    fetchQuery = "SELECT NotificationID, CustomerID"
+                            + ", DriverID, OrderID, Message FROM Notifications WHERE CustomerID=" + iuserID + "";
+                    break;
+            }
+            Notification notification = new Notification();
+            ResultSet dbResults = stmt.executeQuery(fetchQuery);
+            while(dbResults.next()) {
+                int notID = dbResults.getInt("NotificationID");
+                int custID = dbResults.getInt("CusomterID");
+                int drivID = dbResults.getInt("DriverID");
+                String mess = dbResults.getString("Message");
+                int ordID = dbResults.getInt("OrderID");
+                
+                notification = new Notification(notID, ordID, drivID, custID, mess);
+            }
+            return notification;
         } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Error updating location: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);  
-        }        
+            throw new Exception();
+        }
     }
 }

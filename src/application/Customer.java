@@ -10,6 +10,7 @@
  */
 package application;
 
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -18,9 +19,7 @@ public class Customer extends User {
     
     //CLASS VARIABLES
     private String location;
-    private IOdb database;
-    private IOmaps geolocation;
-    private int customerID;
+    private IOmap geolocation;
     
     //CONSTRUCTOR
     //Parameters: user name, password, "is it a 'log in' or a 'sign up' event"
@@ -28,26 +27,31 @@ public class Customer extends User {
     //
     //gets the location, if it is a signup event it will create a new account
     //logs the user in
-    public Customer(String iuserName, String ipassword) {
+    public Customer(String iuserName, String ipassword) throws Exception {
         super(iuserName, ipassword);
         
-        database = new IOdb();
-        geolocation = new IOmaps();
-        String ilocation = geolocation.getLocation("CUSTOMER");
-        setLocation(ilocation);       
-        
-        this.logIn();
+        geolocation = new IOmap();
+        String location = geolocation.getLocation("CUSTOMER");
+        setLocation(location);              
+        try {
+            this.logIn("CUSTOMER", location);
+        } catch (Exception ex) {
+            throw new Exception();
+        }
     }
   
-    public Customer(String iuserName, String ipassword, String iname) {
+    public Customer(String iuserName, String ipassword, String iname) throws Exception {
         super(iuserName, ipassword);
         
-        database = new IOdb();
-        geolocation = new IOmaps();
-        String ilocation = geolocation.getLocation("CUSTOMER");
-        setLocation(ilocation);               
+        geolocation = new IOmap();
+        String location = geolocation.getLocation("CUSTOMER");
+        setLocation(location);               
         
-        this.signUp(iname);
+        try {
+            this.signUp(iname, location);
+        } catch(Exception e) {
+            throw new Exception();
+        }
     }    
     
     //void orderTaxi(pick up point, destination)
@@ -57,48 +61,41 @@ public class Customer extends User {
     //finds the nearest driver, records a trip and creates a new notification for a driver
     //to either accept or reject an order
     public void orderTaxi(String ipickUpPoint, String idestination) {
+        idestination += ",Cork,Ireland";
         if(ipickUpPoint==null) {
-            ipickUpPoint = this.location;
-        }        
+            ipickUpPoint = this.getLocation();
+        } else {
+            ipickUpPoint += ",Cork,Ireland";
+        }
+        
         Order trip = new Order();
         double distance = geolocation.calculateDistance(idestination, ipickUpPoint);
+        double time = geolocation.calculateDuration(idestination, ipickUpPoint);
         int driverID;
         try {
             driverID = database.findClosestDriver(ipickUpPoint, 0);
-            int orderID = trip.recordOrder(ipickUpPoint, idestination, distance, driverID, this.customerID, "PENDING");
-            IOnotifications notification = new IOnotifications(orderID, driverID, this.customerID, "TRIP_REQUEST");
+            int orderID = trip.recordOrder(ipickUpPoint, idestination, distance, driverID, this.getID(), "PENDING", time);
+            Notification notification = new Notification(orderID, driverID, this.getID(), "TRIP_REQUEST");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Driver was not found!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
-        }
-
-    }
-    
-    //void logIn()
-    //logs in the user
-    public final void logIn() {
-        try {
-            database.logIn("CUSTOMER", this.userName, this.password, this.location);
-            this.customerID = database.getID(this.userName, "CUSTOMER");
-        } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Login and password do not match!" + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "No available drivers! Try again later.", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     
     //void signUp()
     //signs up a user
-    public final void signUp(String iname) {
+    private void signUp(String iname, String ilocation) throws Exception {
         try {
-            if(database.signUp("CUSTOMER", this.userName, this.password, iname))
-               this.logIn(); 
+            database.signUp("CUSTOMER", this.userName, this.password, iname);
+            this.logIn("CUSTOMER", ilocation); 
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error connecting to database!" + ex.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            throw new Exception();
         }
     }
 
     //void logOut()
     //logs out the user    
     public void logOut() throws Throwable {
-        database.logOut(this.userName, "CUSTOMER");
+        database.executeUpdateQuery("UPDATE NAME.Customers SET Status='LOGGED_OUT' WHERE UserName='" + this.userName + "'");
         this.finalize();
     }
     
@@ -106,30 +103,27 @@ public class Customer extends User {
     //cancels an order
     //creates a notification for a driver
     public void cancelTaxi(int iorderID) {
-        database.updateOrderStatus("CANCELLED", iorderID);
+        try {            
+            database.executeUpdateQuery("UPDATE NAME.Orders SET Status='CANCELLED' WHERE OrderID=" + iorderID + "");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Database error!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+        }
         int driverID = database.findOrderDriverID(iorderID);
-        IOnotifications notification = new IOnotifications(iorderID, driverID, this.customerID, "CANCELLED");
-    }
-    
-    //void changeOrderDetails(orderID)
-    //creates a notification for a driver
-    public void changeOrderDetails(int orderID) {
-        
+        Notification notification = new Notification(iorderID, driverID, this.getID(), "CANCELLED");
     }
     
     //handleNotification(message "ALTERED, CANCELLED, etc.", response - from a messagebox)
     //deals with notifications according to their type/message
-    public void handleNotification(String notificationMessage, String popupResponse) {
-        switch (notificationMessage) {
-            case "a": // in case of yes/no messageboxes 
-                popupResponse = "AVAILABLE";
-                /*database table - driver*/
+    public void handleNotification(Notification notification, int imessageBoxResponse) {
+        Notification newNotification = new Notification();
+        switch (notification.getMessage()) {
+            case "TRIP_ACCEPTED":                 
+                notification.deleteNotification(notification.getNotificationID());            
                 break;
-            case "b":
-                /*database table - customer*/
+            case "NO_DRIVERS": 
+                JOptionPane.showMessageDialog(null, "No available drivers!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+                notification.deleteNotification(notification.getNotificationID());                 
                 break;
-            case "c":
-                /*database table - dispatcher*/
         }
     }
     

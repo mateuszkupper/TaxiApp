@@ -10,6 +10,7 @@
 package application;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import javax.swing.JOptionPane;
 
 
 public class Order {
@@ -18,7 +19,7 @@ public class Order {
     private String time;
     private String pickupPointLocation;
     private String destination;
-    private String travelTime;
+    private double travelTime;
     private int driverID;
     private int customerID;
     private double distance;
@@ -30,9 +31,9 @@ public class Order {
     //
     //Gets current time
     //Sets and saves order details
-    public int recordOrder(String ipickupPointLocation, String idestination, double idistance, int idriverID, int icustomerID, String istatus) {
+    public int recordOrder(String ipickupPointLocation, String idestination, double idistance, int idriverID, int icustomerID, String istatus, double itravelTime) {
             int orderID;
-            
+            setTravelTime(itravelTime);
             setPickupPointLocation(ipickupPointLocation);
             setDestination(idestination);
             setDistance(idistance);
@@ -43,6 +44,23 @@ public class Order {
             return orderID;
     }
     
+    public void rescheduleOrder(int iorderID, int ioldDriverID) throws Exception {
+        try {
+            database.rescheduleOrder(iorderID, ioldDriverID);
+        } catch(Exception e) {
+            throw new Exception();
+        }            
+    }
+    
+    public int[] getOrders(int idriverID) throws Exception {
+        try {        
+            int[] orders = database.getOrders(idriverID);
+            return orders;
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog(null, "Error getting orders: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            throw new Exception();
+        }          
+    }
     /*
     * Getters & Setters
     */
@@ -70,11 +88,11 @@ public class Order {
         this.destination = destination;
     }
 
-    public String getTravelTime() {
+    public double getTravelTime() {
         return travelTime;
     }
 
-    public final void setTravelTime(String travelTime) {
+    public final void setTravelTime(double travelTime) {
         this.travelTime = travelTime;
     }
 

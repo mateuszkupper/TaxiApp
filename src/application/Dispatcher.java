@@ -4,26 +4,24 @@
  * and open the template in the editor.
  */
 package application;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 public class Dispatcher extends User {
     
     //CLASS VARIABLES
-    IOdb database;
-    IOmaps geolocation;
+    private IOmap geolocation;
     
-    public Dispatcher(String iuserName, String ipassword) {
+    public Dispatcher(String iuserName, String ipassword) throws Exception {
         super(iuserName, ipassword);        
-        geolocation = new IOmaps();
-        database = new IOdb();
-        this.logIn();
-    }
-
-    public final void logIn() {
+        geolocation = new IOmap();      
+        
         try {
-            database.logIn("DISPATCHER", this.userName, this.password, "DISPATCHER");
-        } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Login and password do not match!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            this.logIn("DISPATCHER", "");
+        } catch (Exception ex) {
+            throw new Exception();
         }
     }
     
@@ -36,19 +34,26 @@ public class Dispatcher extends User {
     }
             
     public void cancelTaxi(int iorderID) {
-        database.updateOrderStatus("CANCELLED", iorderID);
+        try {
+            database.executeUpdateQuery("UPDATE NAME.Orders SET Status='CANCELLED' WHERE OrderID=" + iorderID + "");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Database error!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+        }
         int driverID = database.findOrderDriverID(iorderID);
-        IOnotifications notification = new IOnotifications(iorderID, driverID, 0, "CANCELLED");
+        Notification notification = new Notification(iorderID, driverID, 0, "CANCELLED");
     }
 
 
-    public void orderTaxi(String ipickUpPoint, String idestination) { 
+    public void orderTaxi(String ipickUpPoint, String idestination) {
+        idestination += ",Cork,Ireland";
+        ipickUpPoint += ",Cork,Ireland";
         Order trip = new Order();
         double distance = geolocation.calculateDistance(idestination, ipickUpPoint);
+        double time = geolocation.calculateDuration(idestination, ipickUpPoint);        
         try {
             int driverID = database.findClosestDriver(ipickUpPoint, 0);
-            int orderID = trip.recordOrder(ipickUpPoint, idestination, distance, driverID, 0, "PENDING");
-            IOnotifications notification = new IOnotifications(orderID, driverID, 0, "TRIP_REQUEST");
+            int orderID = trip.recordOrder(ipickUpPoint, idestination, distance, driverID, 0, "PENDING", time);
+            Notification notification = new Notification(orderID, driverID, 0, "TRIP_REQUEST");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Driver was not found!" + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
         }
