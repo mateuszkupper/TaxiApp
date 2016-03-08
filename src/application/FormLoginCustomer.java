@@ -7,6 +7,7 @@ package application;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 
 /**
  *
@@ -19,6 +20,7 @@ public class FormLoginCustomer extends javax.swing.JFrame {
      */
     public FormLoginCustomer() {
         initComponents();
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     /**

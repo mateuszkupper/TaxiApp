@@ -5,6 +5,8 @@
  */
 package application;
 
+import javax.swing.JFrame;
+
 /**
  *
  * @author 114310771
@@ -16,6 +18,7 @@ public class FormLoginMenu extends javax.swing.JFrame {
      */
     public FormLoginMenu() {
         initComponents();
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     /**

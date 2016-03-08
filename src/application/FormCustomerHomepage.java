@@ -5,6 +5,8 @@
  */
 package application;
 
+import javax.swing.JFrame;
+
 /**
  *
  * @author 114310771
@@ -16,6 +18,7 @@ public class FormCustomerHomepage extends javax.swing.JFrame {
      */
     public FormCustomerHomepage() {
         initComponents();
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     /**

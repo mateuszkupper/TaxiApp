@@ -345,7 +345,7 @@ public class IOdb {
             ResultSet dbResults = stmt.executeQuery(fetchQuery);
             while(dbResults.next()) {
                 int notID = dbResults.getInt("NotificationID");
-                int custID = dbResults.getInt("CusomterID");
+                int custID = dbResults.getInt("CustomerID");
                 int drivID = dbResults.getInt("DriverID");
                 String mess = dbResults.getString("Message");
                 int ordID = dbResults.getInt("OrderID");

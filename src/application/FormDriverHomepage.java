@@ -5,11 +5,20 @@
  */
 package application;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import static javafx.scene.input.KeyCode.X;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
+
 /**
  *
  * @author 114310771
  */
-public class FormDriverHomepage extends javax.swing.JFrame {
+public class FormDriverHomepage extends javax.swing.JFrame  {
     private Driver driver;
 
     /**
@@ -17,6 +26,9 @@ public class FormDriverHomepage extends javax.swing.JFrame {
      */
     public FormDriverHomepage() {
         initComponents();
+        timer.setRepeats(true);
+        timer.setCoalesce(true);
+        timer.start(); 
     }
 
     /**
@@ -55,6 +67,11 @@ public class FormDriverHomepage extends javax.swing.JFrame {
         lblDestination.setText("Destination");
 
         btnStatistics.setText("Statistics");
+        btnStatistics.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStatisticsActionPerformed(evt);
+            }
+        });
 
         lblCost.setText("Cost");
 
@@ -132,6 +149,27 @@ public class FormDriverHomepage extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnStatisticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStatisticsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnStatisticsActionPerformed
+  
+    Timer timer = new Timer(2000, new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+            IOdb database = new IOdb();
+            try {
+                Notification notification = database.checkForNotification("DRIVER", driver.getID());
+                if(notification!=null) {
+                    if("TRIP_REQUEST".equals(notification.getMessage())) {
+                        int reply = JOptionPane.showConfirmDialog(null, "New trip request! Accept?", "Trip request", JOptionPane.YES_NO_OPTION);
+                        driver.handleNotification(notification, reply);
+                    }
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error getting a notification!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    });
+    
     /**
      * @param args the command line arguments
      */
