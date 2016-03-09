@@ -5,7 +5,11 @@
  */
 package application;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
 /**
  *
@@ -13,14 +17,54 @@ import javax.swing.JFrame;
  */
 public class FormCustomerHomepage extends javax.swing.JFrame {
     private Customer customer;
+    private Order order;
+    private Notification notification;
+    private Notification notificationCancel;
     /**
      * Creates new form Orders
      */
     public FormCustomerHomepage() {
         initComponents();
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        timer.setRepeats(true);
+        timer.setCoalesce(true);
+        timer.start();
+        lblTime.setVisible(false);
+        lblTimeTime.setVisible(false);
+        lblDriver.setVisible(false);
+        lblDriverName.setVisible(false);
     }
 
+    Timer timer = new Timer(2000, new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+            IOdb database = new IOdb();
+            try {
+                notification = database.checkForNotification("CUSTOMER", customer.getID());
+                if(notification.getNotificationID()!=0) {                    
+                        if("TRIP_ACCEPTED".equals(notification.getMessage())) {
+                            notificationCancel=notification;
+                            JOptionPane.showMessageDialog(null, "Trip accepted!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+                            customer.handleNotification(notification);
+                            order = database.getOrder(notification.getOrderID());
+                            txtPickUpPoint.setEnabled(false);
+                            txtDestination.setEnabled(false);
+                            lblDriver.setVisible(true);
+                            lblTime.setVisible(true);
+                            chkPickMeUphere.setEnabled(false);
+                            lblTimeTime.setVisible(true);
+                            lblDriverName.setVisible(true);
+                            lblTimeTime.setText(String.valueOf(order.getTravelTime()) + " minutes");
+                            lblDriverName.setText(String.valueOf(notification.getDriverID()));
+                            btnRequest.setEnabled(false);
+                            btnCancelOrder.setEnabled(true);
+                        }
+                    }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error getting a notification!", "Error" + "Login", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    });    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -36,6 +80,13 @@ public class FormCustomerHomepage extends javax.swing.JFrame {
         txtDestination = new javax.swing.JTextField();
         btnRequest = new javax.swing.JButton();
         chkPickMeUphere = new javax.swing.JCheckBox();
+        lblDriver = new javax.swing.JLabel();
+        lblTime = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        lblDriverName = new javax.swing.JLabel();
+        lblTimeTime = new javax.swing.JLabel();
+        btnCancelOrder = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -57,6 +108,22 @@ public class FormCustomerHomepage extends javax.swing.JFrame {
             }
         });
 
+        lblDriver.setText("Driver ID:");
+
+        lblTime.setText("Time:");
+
+        lblDriverName.setText("jLabel1");
+
+        lblTimeTime.setText("jLabel1");
+
+        btnCancelOrder.setText("Cancel Order");
+        btnCancelOrder.setEnabled(false);
+        btnCancelOrder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelOrderActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -66,6 +133,8 @@ public class FormCustomerHomepage extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnCancelOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -78,11 +147,38 @@ public class FormCustomerHomepage extends javax.swing.JFrame {
                                 .addComponent(txtPickUpPoint, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
                                 .addComponent(txtDestination, javax.swing.GroupLayout.Alignment.TRAILING)))))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTime)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblDriver)
+                        .addGap(74, 74, 74)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblTimeTime))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblDriverName)))))
+                .addContainerGap(220, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(109, 109, 109)
+                .addGap(21, 21, 21)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblDriver)
+                    .addComponent(jLabel3)
+                    .addComponent(lblDriverName))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblTime)
+                    .addComponent(jLabel4)
+                    .addComponent(lblTimeTime))
+                .addGap(42, 42, 42)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblPickUpPoint)
                     .addComponent(txtPickUpPoint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -93,7 +189,9 @@ public class FormCustomerHomepage extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkPickMeUphere)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
-                .addComponent(btnRequest)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRequest)
+                    .addComponent(btnCancelOrder))
                 .addContainerGap())
         );
 
@@ -101,15 +199,39 @@ public class FormCustomerHomepage extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRequestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRequestActionPerformed
+        JOptionPane.showMessageDialog(null, "Wait for a driver to respond", "Wait" + "Login", JOptionPane.INFORMATION_MESSAGE);
         String pickUpPoint = txtPickUpPoint.getText();
         String destination = txtDestination.getText();
         customer.orderTaxi(pickUpPoint, destination);
     }//GEN-LAST:event_btnRequestActionPerformed
 
     private void chkPickMeUphereActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPickMeUphereActionPerformed
-        txtPickUpPoint.setEnabled(false);
-        txtPickUpPoint.setText("Here");
+        if("Here".equals(txtPickUpPoint.getText())) {
+            txtPickUpPoint.setText("");
+            txtPickUpPoint.setEnabled(true);
+        } else {
+            txtPickUpPoint.setText("Here");
+            txtPickUpPoint.setEnabled(false);
+        }
+
     }//GEN-LAST:event_chkPickMeUphereActionPerformed
+
+    private void btnCancelOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelOrderActionPerformed
+        customer.cancelTaxi(notificationCancel.getOrderID());
+        txtPickUpPoint.setEnabled(true);
+        txtDestination.setEnabled(true);
+        lblDriver.setVisible(false);
+        lblTime.setVisible(false);
+        chkPickMeUphere.setEnabled(true);
+        lblTimeTime.setVisible(false);
+        lblDriverName.setVisible(false);
+        lblTimeTime.setText("");
+        lblDriverName.setText("");
+        btnRequest.setEnabled(true);
+        btnCancelOrder.setEnabled(false);
+        txtPickUpPoint.setText("");
+        txtDestination.setText("");
+    }//GEN-LAST:event_btnCancelOrderActionPerformed
 
     /**
      * @param args the command line arguments
@@ -178,10 +300,17 @@ public class FormCustomerHomepage extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancelOrder;
     private javax.swing.JButton btnRequest;
     private javax.swing.JCheckBox chkPickMeUphere;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel lblDestination;
+    private javax.swing.JLabel lblDriver;
+    private javax.swing.JLabel lblDriverName;
     private javax.swing.JLabel lblPickUpPoint;
+    private javax.swing.JLabel lblTime;
+    private javax.swing.JLabel lblTimeTime;
     private javax.swing.JTextField txtDestination;
     private javax.swing.JTextField txtPickUpPoint;
     // End of variables declaration//GEN-END:variables

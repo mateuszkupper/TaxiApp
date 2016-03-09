@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static javafx.scene.input.KeyCode.X;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
@@ -20,15 +20,18 @@ import javax.swing.Timer;
  */
 public class FormDriverHomepage extends javax.swing.JFrame  {
     private Driver driver;
-
+    private Order order;
+    private Notification notification;
+    private Notification notificationCancel;
     /**
      * Creates new form ConfirmLift
      */
     public FormDriverHomepage() {
         initComponents();
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);        
         timer.setRepeats(true);
         timer.setCoalesce(true);
-        timer.start(); 
+        timer.start();
     }
 
     /**
@@ -49,10 +52,11 @@ public class FormDriverHomepage extends javax.swing.JFrame  {
         lblDestination = new javax.swing.JLabel();
         txtPickUpPoint = new javax.swing.JTextField();
         txtDestination = new javax.swing.JTextField();
-        btnStatistics = new javax.swing.JButton();
         lblCost = new javax.swing.JLabel();
         txtCost = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        btnArrived = new javax.swing.JButton();
+        btnRecordTrip = new javax.swing.JButton();
+        btnCancelTrip = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -61,41 +65,46 @@ public class FormDriverHomepage extends javax.swing.JFrame  {
         lblTime.setText("Time");
 
         btnConfirmLift.setText("Finish Lift");
+        btnConfirmLift.setEnabled(false);
 
         lblPickUpPoint.setText("Pick Up Point");
 
         lblDestination.setText("Destination");
 
-        btnStatistics.setText("Statistics");
-        btnStatistics.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnStatisticsActionPerformed(evt);
-            }
-        });
-
         lblCost.setText("Cost");
 
-        jButton1.setText("Arrived At Pick Up Point");
+        btnArrived.setText("Arrived At Pick Up Point");
+        btnArrived.setEnabled(false);
+
+        btnRecordTrip.setText("Record Trip");
+
+        btnCancelTrip.setText("Cancel Trip");
+        btnCancelTrip.setEnabled(false);
+        btnCancelTrip.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelTripActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnCancelTrip, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRecordTrip, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnArrived, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnConfirmLift, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(113, 113, 113))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnStatistics, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnConfirmLift, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblDestination)
                             .addComponent(lblDistance)
-                            .addComponent(lblTime)
                             .addComponent(lblPickUpPoint))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -106,14 +115,16 @@ public class FormDriverHomepage extends javax.swing.JFrame  {
                                 .addContainerGap())
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(228, 228, 228)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtCost)
-                                    .addComponent(txtTime, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
-                                    .addComponent(txtDistance, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(txtTime, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtDistance, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtCost, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblCost)
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblCost)
+                            .addComponent(lblTime))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -130,7 +141,7 @@ public class FormDriverHomepage extends javax.swing.JFrame  {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtDistance, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblDistance))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblTime))
@@ -138,30 +149,85 @@ public class FormDriverHomepage extends javax.swing.JFrame  {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblCost)
                     .addComponent(txtCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(78, 78, 78)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnConfirmLift)
-                    .addComponent(btnStatistics)
-                    .addComponent(jButton1))
-                .addContainerGap())
+                .addGap(18, 18, 18)
+                .addComponent(btnCancelTrip)
+                .addGap(9, 9, 9)
+                .addComponent(btnRecordTrip)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnArrived)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnConfirmLift)
+                .addGap(8, 8, 8))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnStatisticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStatisticsActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnStatisticsActionPerformed
+    private void btnCancelTripActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelTripActionPerformed
+        driver.cancelOrder(notificationCancel.getOrderID());
+        txtPickUpPoint.setEnabled(true);
+        txtDestination.setEnabled(true);
+        txtDistance.setEnabled(true);
+        txtTime.setEnabled(true);
+        txtCost.setEnabled(true);
+        btnCancelTrip.setEnabled(true);
+        btnArrived.setEnabled(true);
+        btnRecordTrip.setEnabled(true);
+
+
+        txtPickUpPoint.setText("");
+        txtDestination.setText("");
+        txtDistance.setText("");
+        txtTime.setText("");
+        txtCost.setText("");        
+    }//GEN-LAST:event_btnCancelTripActionPerformed
   
     Timer timer = new Timer(2000, new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             IOdb database = new IOdb();
             try {
-                Notification notification = database.checkForNotification("DRIVER", driver.getID());
-                if(notification!=null) {
+                notification = database.checkForNotification("DRIVER", driver.getID());
+                if(notification.getNotificationID()!=0) {
                     if("TRIP_REQUEST".equals(notification.getMessage())) {
-                        int reply = JOptionPane.showConfirmDialog(null, "New trip request! Accept?", "Trip request", JOptionPane.YES_NO_OPTION);
-                        driver.handleNotification(notification, reply);
+                        order = database.getOrder(notification.getOrderID());
+                        notificationCancel=notification;
+                        int reply = JOptionPane.showConfirmDialog(null, "New trip request: from: " + order.getPickupPointLocation() + ", to: " + order.getDestination() + ". Accept?", "Trip request", JOptionPane.YES_NO_OPTION);
+                        if(reply==JOptionPane.YES_OPTION) {
+                            driver.handleNotification(notification, reply);
+                            txtPickUpPoint.setEnabled(false);
+                            txtDestination.setEnabled(false);
+                            txtDistance.setEnabled(false);
+                            txtTime.setEnabled(false);
+                            txtCost.setEnabled(false);
+                            btnCancelTrip.setEnabled(true);
+                            btnArrived.setEnabled(true);
+                            btnRecordTrip.setEnabled(false);
+                            
+
+                            txtPickUpPoint.setText(order.getPickupPointLocation());
+                            txtDestination.setText(order.getDestination());
+                            txtDistance.setText(String.valueOf(order.getDistance()) + " km");
+                            txtTime.setText(String.valueOf(order.getTravelTime()) + " minutes");
+                            txtCost.setText("€" + String.valueOf(order.getDistance()*2));
+                        }
+                    } else if("CANCELLED".equals(notification.getMessage())) {
+                        JOptionPane.showMessageDialog(null, "The order has been cancelled!", "Order Cancelled", JOptionPane.INFORMATION_MESSAGE);
+                        driver.handleNotification(notification, 0);
+                        txtPickUpPoint.setEnabled(true);
+                        txtDestination.setEnabled(true);
+                        txtDistance.setEnabled(true);
+                        txtTime.setEnabled(true);
+                        txtCost.setEnabled(true);
+                        btnCancelTrip.setEnabled(false);
+                        btnArrived.setEnabled(false);
+                        btnRecordTrip.setEnabled(true);
+
+
+                        txtPickUpPoint.setText("");
+                        txtDestination.setText("");
+                        txtDistance.setText("");
+                        txtTime.setText("");
+                        txtCost.setText("");
                     }
                 }
             } catch (Exception ex) {
@@ -207,9 +273,10 @@ public class FormDriverHomepage extends javax.swing.JFrame  {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnArrived;
+    private javax.swing.JButton btnCancelTrip;
     private javax.swing.JButton btnConfirmLift;
-    private javax.swing.JButton btnStatistics;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnRecordTrip;
     private javax.swing.JLabel lblCost;
     private javax.swing.JLabel lblDestination;
     private javax.swing.JLabel lblDistance;

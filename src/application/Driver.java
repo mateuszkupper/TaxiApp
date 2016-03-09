@@ -92,14 +92,16 @@ public class Driver extends User {
                 if(imessageBoxResponse==JOptionPane.YES_OPTION) {
                    this.acceptOrder(notification.getOrderID());
                    Notification newNotification = new Notification();
-                   notification.deleteNotification(notification.getNotificationID());
+                   newNotification.deleteNotification(notification.getNotificationID());
                 } else {
                    this.rejectOrder(notification.getOrderID());
                    Notification newNotification = new Notification();
-                   notification.deleteNotification(notification.getNotificationID());
+                   newNotification.deleteNotification(notification.getNotificationID());
                 }             
                 break;
-            case "CANCELLED":               
+            case "CANCELLED":
+                Notification newNotification = new Notification();
+                newNotification.deleteNotification(notification.getNotificationID());
                 break;
         }
     }

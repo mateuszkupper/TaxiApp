@@ -357,4 +357,35 @@ public class IOdb {
             throw new Exception();
         }
     }
+    
+    public Order getOrder(int iorderID) throws Exception {
+        try {        
+            java.sql.Statement stmt = this.loginToDB();
+            String fetchQuery = "SELECT Destination, PickUpPointLocation"
+                                + ", Status, CustomerID, DriverID, Distance, TravelTime FROM Orders WHERE OrderID=" + iorderID + "";
+            Order order = new Order();
+            ResultSet dbResults = stmt.executeQuery(fetchQuery);
+            if(dbResults.next()) {
+                String dest = dbResults.getString("Destination");
+                String pupl = dbResults.getString("PickUpPointLocation");
+                String stat = dbResults.getString("Status");
+                int cust = dbResults.getInt("CustomerID");
+                int driv = dbResults.getInt("DriverID");
+                double dist = dbResults.getDouble("Distance");
+                double tt = dbResults.getDouble("TravelTime");
+                
+                order = new Order();
+                order.setCustomerID(cust);
+                order.setDestination(dest);
+                order.setDistance(dist);
+                order.setDriverID(driv);
+                order.setPickupPointLocation(pupl);
+                order.setStatus(stat);
+                order.setTravelTime(tt);               
+            } 
+            return order;
+        } catch(Exception e) {
+            throw new Exception();
+        }
+    }
 }

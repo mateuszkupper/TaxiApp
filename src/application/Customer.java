@@ -114,15 +114,15 @@ public class Customer extends User {
     
     //handleNotification(message "ALTERED, CANCELLED, etc.", response - from a messagebox)
     //deals with notifications according to their type/message
-    public void handleNotification(Notification notification, int imessageBoxResponse) {
+    public void handleNotification(Notification notification) {
         Notification newNotification = new Notification();
         switch (notification.getMessage()) {
-            case "TRIP_ACCEPTED":                 
-                notification.deleteNotification(notification.getNotificationID());            
+            case "TRIP_ACCEPTED":              
+                newNotification.deleteNotification(notification.getNotificationID());            
                 break;
             case "NO_DRIVERS": 
                 JOptionPane.showMessageDialog(null, "No available drivers!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
-                notification.deleteNotification(notification.getNotificationID());                 
+                newNotification.deleteNotification(notification.getNotificationID());                 
                 break;
         }
     }

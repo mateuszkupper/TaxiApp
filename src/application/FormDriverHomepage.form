@@ -23,22 +23,23 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="btnCancelTrip" min="-2" pref="168" max="-2" attributes="0"/>
+                  <Component id="btnRecordTrip" min="-2" pref="168" max="-2" attributes="0"/>
+                  <Component id="btnArrived" alignment="0" min="-2" pref="168" max="-2" attributes="0"/>
+                  <Component id="btnConfirmLift" alignment="0" min="-2" pref="168" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="113" max="-2" attributes="0"/>
+          </Group>
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="btnStatistics" min="-2" pref="101" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jButton1" min="-2" pref="168" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="btnConfirmLift" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="lblDestination" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="lblDistance" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="lblTime" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="lblPickUpPoint" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -52,18 +53,21 @@
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="228" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="txtCost" max="32767" attributes="0"/>
-                                  <Component id="txtTime" pref="83" max="32767" attributes="0"/>
-                                  <Component id="txtDistance" pref="83" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="txtTime" min="-2" pref="83" max="-2" attributes="0"/>
+                                  <Component id="txtDistance" min="-2" pref="83" max="-2" attributes="0"/>
+                                  <Component id="txtCost" alignment="1" min="-2" pref="83" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="lblCost" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="lblCost" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblTime" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -87,7 +91,7 @@
                   <Component id="txtDistance" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblDistance" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="20" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="txtTime" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblTime" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -97,13 +101,15 @@
                   <Component id="lblCost" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtCost" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="78" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="btnConfirmLift" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnStatistics" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="btnCancelTrip" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+              <Component id="btnRecordTrip" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="btnArrived" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="btnConfirmLift" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -126,6 +132,7 @@
     <Component class="javax.swing.JButton" name="btnConfirmLift">
       <Properties>
         <Property name="text" type="java.lang.String" value="Finish Lift"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblPickUpPoint">
@@ -142,14 +149,6 @@
     </Component>
     <Component class="javax.swing.JTextField" name="txtDestination">
     </Component>
-    <Component class="javax.swing.JButton" name="btnStatistics">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Statistics"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnStatisticsActionPerformed"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JLabel" name="lblCost">
       <Properties>
         <Property name="text" type="java.lang.String" value="Cost"/>
@@ -157,10 +156,25 @@
     </Component>
     <Component class="javax.swing.JTextField" name="txtCost">
     </Component>
-    <Component class="javax.swing.JButton" name="jButton1">
+    <Component class="javax.swing.JButton" name="btnArrived">
       <Properties>
         <Property name="text" type="java.lang.String" value="Arrived At Pick Up Point"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnRecordTrip">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Record Trip"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnCancelTrip">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Cancel Trip"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCancelTripActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

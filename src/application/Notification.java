@@ -51,7 +51,7 @@ public class Notification {
         try {
             database.executeUpdateQuery("DELETE FROM Notifications WHERE NotificationID=" + inotificationID);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Database error!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Database error!" + ex.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
         }
     } 
 

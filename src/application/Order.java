@@ -20,6 +20,7 @@ public class Order {
     private String pickupPointLocation;
     private String destination;
     private double travelTime;
+    private int orderID;
     private int driverID;
     private int customerID;
     private double distance;
@@ -32,7 +33,6 @@ public class Order {
     //Gets current time
     //Sets and saves order details
     public int recordOrder(String ipickupPointLocation, String idestination, double idistance, int idriverID, int icustomerID, String istatus, double itravelTime) {
-            int orderID;
             setTravelTime(itravelTime);
             setPickupPointLocation(ipickupPointLocation);
             setDestination(idestination);
@@ -40,8 +40,8 @@ public class Order {
             setStatus(istatus);
             setDriverID(idriverID);
             setCustomerID(icustomerID);
-            orderID = database.recordTripDetails(this);
-            return orderID;
+            setOrderID(database.recordTripDetails(this));
+            return getOrderID();
     }
     
     public void rescheduleOrder(int iorderID, int ioldDriverID) throws Exception {
@@ -135,4 +135,18 @@ public class Order {
     public final void setStatus(String status) {
         this.status = status;
     }  
+
+    /**
+     * @return the orderID
+     */
+    public int getOrderID() {
+        return orderID;
+    }
+
+    /**
+     * @param orderID the orderID to set
+     */
+    public void setOrderID(int orderID) {
+        this.orderID = orderID;
+    }
 }
