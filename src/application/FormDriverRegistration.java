@@ -1,5 +1,5 @@
 /**
-* <h1>LOGIN CUSTOMER</h1>
+* <h1>DRIVER REGISTRATION</h1>
 * <p>
 * 
 *
@@ -13,52 +13,49 @@ package application;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-public class FormLoginCustomer extends javax.swing.JFrame {
+public class FormDriverRegistration extends javax.swing.JFrame {
+    private Dispatcher dispatcher;
 
-    public FormLoginCustomer() {
+    public FormDriverRegistration() {
         initComponents();
         //close form on close
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);        
     }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lblPassword = new javax.swing.JLabel();
         lblCustomerLogin = new javax.swing.JLabel();
-        btnLogin = new javax.swing.JButton();
-        btnSignUp = new javax.swing.JButton();
+        txtPassword = new javax.swing.JPasswordField();
         lblUserName = new javax.swing.JLabel();
         txtUserName = new javax.swing.JTextField();
-        lblPassword = new javax.swing.JLabel();
-        txtPassword = new javax.swing.JPasswordField();
+        btnSignUp = new javax.swing.JButton();
+        lblPassword1 = new javax.swing.JLabel();
+        txtName = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        lblCustomerLogin.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        lblCustomerLogin.setText("Customer Login");
+        lblPassword.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        lblPassword.setText("Password");
 
-        btnLogin.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        btnLogin.setText("Login");
-        btnLogin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLoginActionPerformed(evt);
-            }
-        });
+        lblCustomerLogin.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblCustomerLogin.setText("Driver Sign Up");
+
+        lblUserName.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        lblUserName.setText("User Name");
 
         btnSignUp.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        btnSignUp.setText("Sign Up");
+        btnSignUp.setText("Register");
         btnSignUp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSignUpActionPerformed(evt);
             }
         });
 
-        lblUserName.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        lblUserName.setText("User Name");
-
-        lblPassword.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        lblPassword.setText("Password");
+        lblPassword1.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        lblPassword1.setText("Driver's name");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -71,69 +68,60 @@ public class FormLoginCustomer extends javax.swing.JFrame {
                         .addComponent(lblCustomerLogin))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(116, 116, 116)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnLogin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnSignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtPassword)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblUserName)
-                                    .addComponent(lblPassword)
-                                    .addComponent(txtUserName, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 1, Short.MAX_VALUE)))))
-                .addGap(115, 115, 115))
+                            .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+                            .addComponent(lblUserName)
+                            .addComponent(lblPassword)
+                            .addComponent(txtUserName, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+                            .addComponent(lblPassword1)
+                            .addComponent(btnSignUp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(116, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(37, 37, 37)
                 .addComponent(lblCustomerLogin)
-                .addGap(26, 26, 26)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblUserName)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtUserName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
+                .addGap(18, 18, 18)
                 .addComponent(lblPassword)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(36, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(lblPassword1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26)
+                .addComponent(btnSignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+    private void btnSignUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignUpActionPerformed
         String username = txtUserName.getText();
         String password = txtPassword.getText();
+        String name = txtName.getText();
         //if not blank
-        if (!"".equals(username) && !"".equals(password)) {
+        if (!"".equals(username) && !"".equals(password) && !"".equals(name)) {
             try {
-                //login customer
-                Customer customer = new Customer(username, password);
-                //open customer main menu
+                //sign up driver
+                getDispatcher().signUpUser(username, password, name, "DRIVER");
+                //close form
                 this.setVisible(false);
-                FormCustomerHomepage newFrame = new FormCustomerHomepage();
-                newFrame.setVisible(true);
-                newFrame.setCustomer(customer);
             } catch (Exception ex) {
-
+                JOptionPane.showMessageDialog(null, "Error while connecting to database!", "Error", 
+                                                JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(null, "Fill in all fields!", "Error", 
                                             JOptionPane.INFORMATION_MESSAGE);
         }
-    }//GEN-LAST:event_btnLoginActionPerformed
-
-    private void btnSignUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignUpActionPerformed
-        this.setVisible(false);
-        FormCustomerSignup newFrame = new FormCustomerSignup();
-        newFrame.setVisible(true);
     }//GEN-LAST:event_btnSignUpActionPerformed
 
     /**
@@ -153,32 +141,46 @@ public class FormLoginCustomer extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FormLoginCustomer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FormDriverRegistration.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FormLoginCustomer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FormDriverRegistration.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FormLoginCustomer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FormDriverRegistration.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FormLoginCustomer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FormDriverRegistration.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FormLoginCustomer().setVisible(true);
+                new FormDriverRegistration().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnLogin;
     private javax.swing.JButton btnSignUp;
     private javax.swing.JLabel lblCustomerLogin;
     private javax.swing.JLabel lblPassword;
+    private javax.swing.JLabel lblPassword1;
     private javax.swing.JLabel lblUserName;
+    private javax.swing.JTextField txtName;
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtUserName;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * @return the dispatcher
+     */
+    public Dispatcher getDispatcher() {
+        return dispatcher;
+    }
+
+    /**
+     * @param dispatcher the dispatcher to set
+     */
+    public void setDispatcher(Dispatcher dispatcher) {
+        this.dispatcher = dispatcher;
+    }
 }

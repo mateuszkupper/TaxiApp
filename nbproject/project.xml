@@ -11,5 +11,13 @@
                 <root id="test.src.dir"/>
             </test-roots>
         </data>
+        <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+            <word>dispatcher's</word>
+            <word>geolocating</word>
+            <word>Google</word>
+            <word>int</word>
+            <word>skyhookwireless</word>
+            <word>sql</word>
+        </spellchecker-wordlist>
     </configuration>
 </project>

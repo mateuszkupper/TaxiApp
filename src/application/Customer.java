@@ -1,130 +1,201 @@
-/*
- * CUSTOMER CLASS
- * Attributes: location, (userName, password) - inherited from User class
- *             Objects: database, geolocation
- * Methods: orderTaxi(), logIn(), signUp(), logOut(), cancelTaxi(), changeOrderDetails()
- *          handleNotification()
- * The class represents a physical customer in an application
- * Instances created when customer logs in to the application
- *
- */
+/**
+* <h1>CUSTOMER CLASS</h1>
+* The class represents a physical customer in an application
+* Instances created when customer logs in to the application
+* The class inherits from the user class
+* <p>
+* 
+*
+* @author Mateusz Kupper, Luke Merriman, Eoin Feeney
+* @version 1.0
+* @since   2016-03-13 
+*/
+
 package application;
 
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-public class Customer extends User {
+public class Customer extends User { 
+    
     
     //CLASS VARIABLES
     private String location;
     private IOmap geolocation;
     
-    //CONSTRUCTOR
-    //Parameters: user name, password, "is it a 'log in' or a 'sign up' event"
-    //login_signup - value: "SIGNUP" - for sign up, "LOGIN" - for log in
-    //
-    //gets the location, if it is a signup event it will create a new account
-    //logs the user in
+    
+    /**
+    * CONSTRUCTOR
+    * Used to login customer
+    * @param iuserName
+    * @param ipassword
+    * @throws Exception
+    */
     public Customer(String iuserName, String ipassword) throws Exception {
         super(iuserName, ipassword);
         
+        //set location
         geolocation = new IOmap();
-        String location = geolocation.getLocation("CUSTOMER");
-        setLocation(location);              
+        String locationCust = geolocation.getLocation("CUSTOMER");
+        setLocation(locationCust);
+        
+        //try to login
         try {
-            this.logIn("CUSTOMER", location);
+            this.logIn("CUSTOMER", locationCust);
         } catch (Exception ex) {
             throw new Exception();
         }
     }
-  
+    
+    
+    /**
+    * CONSTRUCTOR
+    * Used to sign up user
+    * @param iuserName
+    * @param ipassword
+    * @param iname This is the actual first and second name
+    * @throws Exception
+    */  
     public Customer(String iuserName, String ipassword, String iname) throws Exception {
         super(iuserName, ipassword);
         
+        //set location
         geolocation = new IOmap();
-        String location = geolocation.getLocation("CUSTOMER");
-        setLocation(location);               
+        String locationCust = geolocation.getLocation("CUSTOMER");
+        setLocation(locationCust);               
         
+        //try to sign up
         try {
-            this.signUp(iname, location);
+            this.signUp(iname, locationCust);
         } catch(Exception e) {
             throw new Exception();
         }
     }    
     
-    //void orderTaxi(pick up point, destination)
-    //
-    //Gets a pick up point and a destination
-    //(if the pick up point is not specified, it sets it to the current location of a customer),
-    //finds the nearest driver, records a trip and creates a new notification for a driver
-    //to either accept or reject an order
+    
+    /**
+    * ORDERTAXI
+    * Used to order taxi by a customer
+    * @param ipickUpPoint
+    * @param idestination
+    */  
     public void orderTaxi(String ipickUpPoint, String idestination) {
+        
+        //ensure that the destination and 
+        //pick up point are in Cork
         idestination += ",Cork,Ireland";
         if("Here".equals(ipickUpPoint)) {
+            //if pick up point not specified 
+            //get location
             ipickUpPoint = this.getLocation();
         } else {
             ipickUpPoint += ",Cork,Ireland";
         }
         
-        Order trip = new Order();
-        double distance = geolocation.calculateDistance(idestination, ipickUpPoint);
-        double time = geolocation.calculateDuration(idestination, ipickUpPoint);
-        int driverID;
+        //try to save the trip
         try {
+            //get distance and ETA
+            Order trip = new Order();
+            double distance = geolocation.calculateDistance(idestination, ipickUpPoint);
+            double time = geolocation.calculateDuration(idestination, ipickUpPoint);
+            
+            //fin closest driver
+            int driverID;
             driverID = database.findClosestDriver(ipickUpPoint, 0);
-            int orderID = trip.recordOrder(ipickUpPoint, idestination, distance, driverID, this.getID(), "PENDING", time);
-            Notification notification = new Notification(orderID, driverID, this.getID(), "TRIP_REQUEST");
+            
+            //save the trip
+            int orderID = trip.recordOrder(ipickUpPoint, 
+                                            idestination, 
+                                            distance, 
+                                            driverID, 
+                                            this.getID(), 
+                                            "PENDING", 
+                                            time);
+            //create notification to driver
+            Notification notification = new Notification(orderID, 
+                                            driverID, 
+                                            this.getID(), 
+                                            "TRIP_REQUEST");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "No available drivers! Try again later.", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "No available drivers or requested trip is outside the Cork city!", 
+                                                "Error", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     
-    //void signUp()
-    //signs up a user
+    
+    /**
+    * SIGNUP
+    * Used to sign up user
+    * Used only in the second CONSTRUCTOR
+    * @param ipickUpPoint
+    * @param idestination
+    * @throws Exception - database error
+    */  
     private void signUp(String iname, String ilocation) throws Exception {
         try {
+            //sign up customer
             database.signUp("CUSTOMER", this.userName, this.password, iname);
+            //if successful log in
             this.logIn("CUSTOMER", ilocation); 
         } catch (Exception ex) {
             throw new Exception();
         }
     }
 
-    //void logOut()
-    //logs out the user    
-    public void logOut() throws Throwable {
-        database.executeUpdateQuery("UPDATE NAME.Customers SET Status='LOGGED_OUT' WHERE UserName='" + this.userName + "'");
+    
+    /**
+    * LOGOUT
+    * Used to log out customer
+    * @param iorderID
+    * @throws Throwable - finalizing THIS customer
+    */      
+    public void logOut(int iorderID) throws Throwable {
+        //update database - customer - logged out
+        database.executeUpdateQuery("UPDATE NAME.Customers SET Status='LOGGED_OUT' WHERE UserName='" 
+                                    + this.userName + "'");
+        //if customer has an active trip
+        //it needs to be cancelled
+        if (iorderID!=0) {
+            this.cancelTaxi(iorderID);
+        }
+        //destroy object
         this.finalize();
     }
     
-    //void cancelTaxi(orderID)
-    //cancels an order
-    //creates a notification for a driver
-    public void cancelTaxi(int iorderID) {
-        try {            
-            database.executeUpdateQuery("UPDATE NAME.Orders SET Status='CANCELLED' WHERE OrderID=" + iorderID + "");
+    
+    /**
+    * CANCELTAXI
+    * Used to cancel taxi by a customer
+    * Sends a notification to a driver
+    * @param iorderID
+    * @throws Exception - database error
+    */    
+    public void cancelTaxi(int iorderID) throws Exception {
+        try {
+            //cancel order
+            database.executeUpdateQuery("UPDATE NAME.Orders SET Status='CANCELLED' WHERE OrderID=" 
+                                        + iorderID + "");
+            //get driver's ID
+            int driverID = database.findOrderDriverID(iorderID);
+            //send a notification to a driver
+            Notification notification = new Notification(iorderID, driverID, this.getID(), "CANCELLED");
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Database error!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Database error!", "Error",
+                                        JOptionPane.INFORMATION_MESSAGE);
         }
-        int driverID = database.findOrderDriverID(iorderID);
-        Notification notification = new Notification(iorderID, driverID, this.getID(), "CANCELLED");
     }
     
-    //handleNotification(message "ALTERED, CANCELLED, etc.", response - from a messagebox)
-    //deals with notifications according to their type/message
+    
+    /**
+    * HANDLENOTIFICATION
+    * Used to handle notifications
+    * Depending on notification.message property
+    * The action is taken
+    * @param notification
+    */  
     public void handleNotification(Notification notification) {
         Notification newNotification = new Notification();
-        switch (notification.getMessage()) {
-            case "TRIP_ACCEPTED":              
-                newNotification.deleteNotification(notification.getNotificationID());            
-                break;
-            case "NO_DRIVERS": 
-                JOptionPane.showMessageDialog(null, "No available drivers!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
-                newNotification.deleteNotification(notification.getNotificationID());                 
-                break;
-        }
+        //delete notifications              
+        newNotification.deleteNotification(notification.getNotificationID());                            
     }
     
     /*

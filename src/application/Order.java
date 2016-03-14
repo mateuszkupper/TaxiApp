@@ -1,19 +1,18 @@
-/*
- * ORDER CLASS
- * Attributes: time, pickup point location, destination, travel time, driver user name, 
- *              customer user name, distance, status, payment amount
- * Methods: recordOrder()
- * The class represents an order in an application
- * Instances created when a driver records a trip or a user requests a taxi
- *
- */
-package application;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import javax.swing.JOptionPane;
+/**
+* <h1>ORDER CLASS</h1>
+* The class represents an order in an application
+* <p>
+* 
+*
+* @author Mateusz Kupper, Luke Merriman, Eoin Feeney
+* @version 1.0
+* @since   2016-03-13 
+*/
 
+package application;
 
 public class Order {
+    
     
     //CLASS VARIABLES    
     private String time;
@@ -24,26 +23,52 @@ public class Order {
     private int driverID;
     private int customerID;
     private double distance;
-    private String status; // PENDING || IN_PROGRESS || FINISHED
+    private String status;
     private double paymentAmount;
     private final IOdb database = new IOdb();  
 
-    //int recordOrder(pick up point location, destination, distance, driver user name, customer user uame, status)
-    //
-    //Gets current time
-    //Sets and saves order details
-    public int recordOrder(String ipickupPointLocation, String idestination, double idistance, int idriverID, int icustomerID, String istatus, double itravelTime) {
-            setTravelTime(itravelTime);
-            setPickupPointLocation(ipickupPointLocation);
-            setDestination(idestination);
-            setDistance(idistance);
-            setStatus(istatus);
-            setDriverID(idriverID);
-            setCustomerID(icustomerID);
+    
+    /**
+    * CONSTRUCTOR
+    * Used to record order
+    * @param ipickupPointLocation
+    * @param idestination
+    * @param idistance
+    * @param idriverID
+    * @param icustomerID
+    * @param istatus
+    * @param itravelTime
+    * @return orderID
+    * @throws Exception
+    */
+    public int recordOrder(String ipickupPointLocation, String idestination, 
+                            double idistance, int idriverID, int icustomerID, 
+                            String istatus, double itravelTime) throws Exception {
+        //assign values                    
+        setTravelTime(itravelTime);
+        setPickupPointLocation(ipickupPointLocation);
+        setDestination(idestination);
+        setDistance(idistance);
+        setStatus(istatus);
+        setDriverID(idriverID);
+        setCustomerID(icustomerID);
+        setTravelTime(itravelTime);
+        try {
+            //record trip and get orderID
             setOrderID(database.recordTripDetails(this));
             return getOrderID();
+        } catch (Exception ex) {
+            throw new Exception();
+        }
     }
     
+    /**
+    * RESCHEDULEORDER
+    * Reschedules orders
+    * @param iorderID
+    * @param ioldDriverID
+    * @throws Exception
+    */ 
     public void rescheduleOrder(int iorderID, int ioldDriverID) throws Exception {
         try {
             database.rescheduleOrder(iorderID, ioldDriverID);
@@ -51,16 +76,25 @@ public class Order {
             throw new Exception();
         }            
     }
-    
+
+
+    /**
+    * RESCHEDULEORDER
+    * Returns order IDs for a given driver
+    * @param idriverID
+    * @return int[] orderIDs
+    * @throws Exception
+    */     
     public int[] getOrders(int idriverID) throws Exception {
         try {        
             int[] orders = database.getOrders(idriverID);
             return orders;
         } catch(Exception e) {
-            JOptionPane.showMessageDialog(null, "Error getting orders: " + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
             throw new Exception();
         }          
     }
+    
+    
     /*
     * Getters & Setters
     */
@@ -136,16 +170,10 @@ public class Order {
         this.status = status;
     }  
 
-    /**
-     * @return the orderID
-     */
     public int getOrderID() {
         return orderID;
     }
 
-    /**
-     * @param orderID the orderID to set
-     */
     public void setOrderID(int orderID) {
         this.orderID = orderID;
     }

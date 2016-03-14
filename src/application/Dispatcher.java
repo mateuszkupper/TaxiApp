@@ -1,23 +1,41 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/**
+* <h1>DISPATCHER CLASS</h1>
+* The class represents a physical dispatcher in an application
+* Instances created when dispatcher logs in to the application
+* The class inherits from the user class
+* <p>
+* 
+*
+* @author Mateusz Kupper, Luke Merriman, Eoin Feeney
+* @version 1.0
+* @since   2016-03-13 
+*/
+
 package application;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.swing.JOptionPane;
 
 public class Dispatcher extends User {
     
+    
     //CLASS VARIABLES
     private IOmap geolocation;
     
+    
+    /**
+    * CONSTRUCTOR
+    * Used to login dispatcher
+    * @param iuserName
+    * @param ipassword
+    * @throws Exception
+    */    
     public Dispatcher(String iuserName, String ipassword) throws Exception {
-        super(iuserName, ipassword);        
+        super(iuserName, ipassword);
+        
+        //create instance of IOmap class
         geolocation = new IOmap();      
         
+        //try to log in dispatcher
         try {
             this.logIn("DISPATCHER", "");
         } catch (Exception ex) {
@@ -25,37 +43,82 @@ public class Dispatcher extends User {
         }
     }
     
-    public final void signUpUser(String iuserName, String ipassword, String iname, String iuserType) {
+    
+    /**
+    * SIGNUP
+    * Used to sign up drivers
+    * @param iuserName
+    * @param ipassword
+    * @param iname
+    * @param iuserType - "DRIVER" or "DISPATCHER
+    * @throws Exception - database error
+    */      
+    public final void signUpUser(String iuserName, String ipassword, String iname, 
+                                    String iuserType) throws Exception {
         try {
             database.signUp(iuserType, iuserName, ipassword, iname);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error connecting to database!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
+            throw new Exception();
         }
     }
-            
-    public void cancelTaxi(int iorderID) {
-        try {
-            database.executeUpdateQuery("UPDATE NAME.Orders SET Status='CANCELLED' WHERE OrderID=" + iorderID + "");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Database error!", "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
-        }
-        int driverID = database.findOrderDriverID(iorderID);
-        Notification notification = new Notification(iorderID, driverID, 0, "CANCELLED");
-    }
 
-
+    
+    /**
+    * ORDERTAXI
+    * Used to order taxi by a dispatcher
+    * Used to facilitate handling phone orders
+    * @param ipickUpPoint
+    * @param idestination
+    */     
     public void orderTaxi(String ipickUpPoint, String idestination) {
+        
+        //ensure that the destination and 
+        //pick up point are in Cork        
         idestination += ",Cork,Ireland";
         ipickUpPoint += ",Cork,Ireland";
-        Order trip = new Order();
-        double distance = geolocation.calculateDistance(idestination, ipickUpPoint);
-        double time = geolocation.calculateDuration(idestination, ipickUpPoint);        
+        
+        //try to save the trip        
         try {
-            int driverID = database.findClosestDriver(ipickUpPoint, 0);
-            int orderID = trip.recordOrder(ipickUpPoint, idestination, distance, driverID, 0, "PENDING", time);
-            Notification notification = new Notification(orderID, driverID, 0, "TRIP_REQUEST");
+            
+            //get distance and ETA            
+            Order trip = new Order();
+            double distance = geolocation.calculateDistance(idestination, ipickUpPoint);
+            double time = geolocation.calculateDuration(idestination, ipickUpPoint);
+           
+            //find closest driver            
+            int driverID;
+            driverID = database.findClosestDriver(ipickUpPoint, 0);
+            
+            //save the trip            
+            int orderID = trip.recordOrder(ipickUpPoint, 
+                                            idestination, 
+                                            distance, 
+                                            driverID, 
+                                            this.getID(), 
+                                            "PENDING", 
+                                            time);           
+            //create notification to driver
+            Notification notification = new Notification(orderID, 
+                                            driverID, 
+                                            this.getID(), 
+                                            "TRIP_REQUEST");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Driver was not found!" + e.getMessage(), "InfoBox: " + "Login", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }   
+            JOptionPane.showMessageDialog(null, "No available drivers or requested trip is outside the Cork city!", 
+                                          "Error", JOptionPane.INFORMATION_MESSAGE);
+        }     
+    }
+
+    
+    /**
+    * HANDLENOTIFICATION
+    * Used to handle notifications
+    * Depending on notification.message property
+    * The action is taken
+    * @param notification
+    */      
+    public void handleNotification(Notification notification) {
+        Notification newNotification = new Notification();
+        //delete notifications              
+        newNotification.deleteNotification(notification.getNotificationID());                  
+    }    
 }
